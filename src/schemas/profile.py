@@ -14,3 +14,8 @@ class ProfilePrivateResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    profile_picture_url: Optional[str] = None

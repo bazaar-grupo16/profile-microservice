@@ -4,7 +4,7 @@ from uuid import UUID
 from src.core.dependencies import DbSession
 from src.core.security import get_current_user_id
 from src.api.controllers import profile as profile_controller
-from src.schemas.profile import ProfilePrivateResponse, ProfileCreate
+from src.schemas.profile import ProfilePrivateResponse, ProfileCreate, ProfileUpdate
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
@@ -22,3 +22,15 @@ def create_profile(
     db: DbSession
 ):
     return profile_controller.create_profile(profile_in=profile_in, db=db)
+
+@router.patch("/me", response_model=ProfilePrivateResponse)
+def update_my_profile(
+    profile_in: ProfileUpdate,
+    db: DbSession,
+    current_user_id: UUID = Depends(get_current_user_id)
+):
+    return profile_controller.update_my_profile(
+        user_id=current_user_id, 
+        profile_in=profile_in, 
+        db=db
+    )

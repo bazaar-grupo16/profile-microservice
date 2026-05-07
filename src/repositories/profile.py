@@ -15,3 +15,13 @@ def create_profile(db: Session, profile_in: ProfileCreate) -> Profile:
     db.commit()
     db.refresh(db_profile)
     return db_profile
+
+def update(db: Session, db_obj: Profile, obj_in: dict):
+    for field in obj_in:
+        if hasattr(db_obj, field):
+            setattr(db_obj, field, obj_in[field])
+    
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
