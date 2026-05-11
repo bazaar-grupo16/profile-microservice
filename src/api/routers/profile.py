@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, UploadFile, File
+from fastapi import APIRouter, Depends, UploadFile, File
 from uuid import UUID
 from src.core.dependencies import DbSession
 from src.core.security import get_current_user_id
