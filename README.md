@@ -127,8 +127,8 @@ docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
 ## Docker
 
 ```bash
-docker build -t template-service .
-docker run -p 8000:8000 --env-file .env template-service
+docker build -t profile-service .
+docker run -p 8000:8000 --env-file .env profile-service
 ```
 
 ## Kubernetes
