@@ -52,3 +52,15 @@ async def upload_avatar(user_id: UUID, file: UploadFile):
     url = storage.upload(data=file_bytes, key=key, content_type=file.content_type)
     
     return {"url": url}
+
+def get_public_profile(user_id: UUID, db: Session):
+    profile = profile_repo.get_profile_by_user_id(db, user_id)
+    
+    if not profile:
+        raise HTTPException(status_code=404, detail="Perfil no encontrado")
+
+    # TODO: CA 3 - Implementar validacion de usuario bloqueado
+    # if profile.is_blocked: 
+    #     raise HTTPException(status_code=404, detail="El perfil no está disponible")
+
+    return profile

@@ -3,7 +3,7 @@ from uuid import UUID
 from src.core.dependencies import DbSession
 from src.core.security import get_current_user_id
 from src.api.controllers import profile as profile_controller
-from src.schemas.profile import ProfilePrivateResponse, ProfileCreate, ProfileUpdate
+from src.schemas.profile import ProfilePrivateResponse, ProfileCreate, ProfileUpdate, ProfilePublicResponse
 from typing import Annotated
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
@@ -43,3 +43,10 @@ async def upload_avatar_endpoint(
     current_user_id: UUID = Depends(get_current_user_id)
 ):
     return await profile_controller.upload_avatar(user_id=current_user_id, file=file)
+
+@router.get("/{user_id}", response_model=ProfilePublicResponse)
+def get_user_profile(
+    user_id: UUID,
+    db: DbSession
+):
+    return profile_controller.get_public_profile(user_id=user_id, db=db)
