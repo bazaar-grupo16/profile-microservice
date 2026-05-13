@@ -24,7 +24,7 @@ spec:
   rules:
     - http:
         paths:
-          - path: /(profile/me)
+          - path: /(profile/(me|upload-avatar))
             pathType: ImplementationSpecific
             backend:
               service:
