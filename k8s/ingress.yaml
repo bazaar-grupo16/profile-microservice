@@ -52,3 +52,10 @@ spec:
                 name: profile-service
                 port:
                   number: 80
+          - path: /(profile/[0-9a-fA-F-]+)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: profile-service
+                port:
+                  number: 80
