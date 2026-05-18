@@ -1,6 +1,6 @@
-# Bazaar — Microservice Template
+# Bazaar — Profile Microservice
 
-Template base para microservicios Python / FastAPI del ecosistema **Bazaar**.
+Profile microservice base para microservicios Python / FastAPI del ecosistema **Bazaar**.
 
 ## Stack
 
@@ -59,7 +59,7 @@ Template base para microservicios Python / FastAPI del ecosistema **Bazaar**.
 
 ```bash
 # 1. Clonar y entrar al directorio
-git clone <REPO_URL> && cd template-microservice
+git clone <REPO_URL> && cd profile-microservice
 
 # 2. Crear entorno virtual
 python -m venv .venv
@@ -100,6 +100,98 @@ doctl kubernetes cluster kubeconfig save <CLUSTER_ID>
 | GET | `/readyz` | Readiness probe — verifica conexión a DB |
 | GET | `/docs` | Swagger UI (auto-generado) |
 | GET | `/redoc` | ReDoc (auto-generado) |
+| GET | `/profile/me` | Obtener el perfil privado del usuario autenticado |
+| POST | `/profile` | Crear un perfil (devuelve el perfil creado) |
+| PATCH | `/profile/me` | Actualizar el perfil del usuario autenticado |
+| POST | `/profile/upload-avatar` | Subir avatar (form-data `file`) |
+| GET | `/profile/{user_id}` | Obtener perfil público por `user_id` |
+
+Detalles de los endpoints de `profile` (payloads y respuestas):
+
+- **POST /profile**
+
+	- Payload (JSON):
+
+	```json
+	{
+	  "user_id": "<uuid>",
+	  "name": "Nombre completo"
+	}
+	```
+
+	- Respuesta (201 Created) — `ProfilePrivateResponse`:
+
+	```json
+	{
+	  "user_id": "<uuid>",
+	  "name": "Nombre completo",
+	  "description": null,
+	  "profile_picture_url": null
+	}
+	```
+
+	- Errores: 400 si el perfil ya existe.
+
+- **GET /profile/me**
+
+	- Autenticación: requiere token que permita resolver `get_current_user_id`.
+
+	- Respuesta (200 OK) — `ProfilePrivateResponse`:
+
+	```json
+	{
+	  "user_id": "<uuid>",
+	  "name": "Nombre",
+	  "description": "Texto opcional",
+	  "profile_picture_url": "https://.../profiles/.../avatar.png"
+	}
+	```
+
+	- Errores: 404 si no existe el perfil.
+
+- **PATCH /profile/me**
+
+	- Payload (JSON, campos opcionales):
+
+	```json
+	{
+	  "name": "Nuevo nombre",
+	  "description": "Nueva descripción",
+	  "profile_picture_url": "https://.../path.png"
+	}
+	```
+
+	- Respuesta (200 OK) — `ProfilePrivateResponse` con los datos actualizados.
+
+- **POST /profile/upload-avatar**
+
+	- Payload: `multipart/form-data` con campo `file` (imagen).
+	- Tipos permitidos: `image/jpeg`, `image/png`, `image/webp`.
+	- Tamaño máximo: 10 MB.
+	- Respuesta (200 OK):
+
+	```json
+	{
+	  "url": "https://<cdn>/<key>"
+	}
+	```
+
+	- Errores: 400 para formato no soportado o tamaño excedido.
+
+- **GET /profile/{user_id}**
+
+	- Respuesta (200 OK) — `ProfilePublicResponse`:
+
+	```json
+	{
+	  "user_id": "<uuid>",
+	  "name": "Nombre",
+	  "description": "Texto público opcional",
+	  "profile_picture_url": "https://.../profiles/.../avatar.png"
+	}
+	```
+
+	- Errores: 404 si no existe el perfil.
 
 ## Tests
 
@@ -187,7 +279,7 @@ Hay dos pipelines de GitHub Actions:
 
 Al iniciar, la aplicación espera a que la base de datos esté disponible usando **backoff exponencial** (1s → 2s → 4s → … hasta 30s por intento, máximo 5 minutos en total) antes de ejecutar las migraciones y aceptar tráfico. Esto evita crasheos durante el arranque del pod cuando la BD aún está inicializándose.
 
-## Extender el template
+## Extender el microservicio
 
 Para agregar una nueva entidad al microservicio:
 
