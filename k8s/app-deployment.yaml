@@ -14,6 +14,9 @@ spec:
       app: profile-service
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
       labels:
         app: profile-service
     spec:
@@ -81,7 +84,16 @@ spec:
                 secretKeyRef:
                   name: profile-db-credentials
                   key: SPACES_CDN_ENDPOINT
-          # ── Probes ─────────────────────────────────
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4317"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "grpc"
+            - name: OTEL_SERVICE_NAME
+              value: profile-service
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "deployment.environment=dev,k8s.cluster.name=bazaar-dev"
+            - name: OTEL_PROPAGATORS
+              value: "tracecontext,baggage"
           livenessProbe:
             httpGet:
               path: /livez
